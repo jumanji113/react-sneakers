@@ -1,72 +1,16 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Card from "./components/Card";
 import Drawer from "./components/Drawer";
 import Header from "./components/Header";
 import axios from 'axios';
 
-// const arr = [
-//     {     "title": "Мужские Кроссовки Nike Blazer Mid Suede", 
-//            "price": 12999, 
-//            "imageUrl": "/img/1.jpg"
-//        },
-//        {
-//            "title": "Мужские Кроссовки Nike Air Max 270", 
-//            "price": 12999, 
-//            "imageUrl": "/img/2.jpg"
-//        },
-//        {
-//            "title": "Мужские Кроссовки Nike Blazer Mid Suede", 
-//            "price": 8499, 
-//            "imageUrl": "/img/3.jpg"
-//        },
-//        {
-//            "title": "Кроссовки Puma X Aka Boku Future Rider", 
-//            "price": 8999, 
-//            "imageUrl": "/img/4.jpg"
-//        },
-//        {
-//            "title": "Мужские Кроссовки Curry 8", 
-//            "price": 15199, 
-//            "imageUrl": "/img/5.jpg"
-//        },
-//        {
-//            "title": "Мужские Кроссовки Nike Kyrie 7", 
-//            "price": 11299, 
-//            "imageUrl": "/img/6.jpg"
-//        },
-//        {
-//            "title": "Мужские Кроссовки Jordan Air Jordan 11", 
-//            "price": 10799, 
-//            "imageUrl": "/img/7.jpg"
-//        },
-//        {
-//            "title": "Мужские Кроссовки Nike LeBron XVIII", 
-//            "price": 16499, 
-//            "imageUrl": "/img/8.jpg"
-//        },
-//        {
-//            "title": "Мужские Кроссовки Nike XVIII Low", 
-//            "price": 13999, 
-//            "imageUrl": "/img/9.jpg"
-//        },
-//        {
-//            "title": "Мужские Кроссовки Nike XVIII Low", 
-//            "price": 13999, 
-//            "imageUrl": "/img/9.jpg"
-//        },
-//        {
-//            "title": "Мужские Кроссовки Nike XVIII Low", 
-//            "price": 13999, 
-//            "imageUrl": "/img/9.jpg"
-//        },
-   
-//    ]
-
-
 function App() {
-    const [items, setItems] =useState([]);
+    const [items, setItems] = useState([]);
+    const [cartItems, setCartItems] = useState([]);
+    const [searchValue, setSearchValue] = useState('');
     const [cartOpened, setCartOpened] = useState();
-    axios
+    useEffect(() => {
+        axios
             .get(
                 'https://63fbb0896deb8bdb81497757.mockapi.io/items',
             )
@@ -74,22 +18,39 @@ function App() {
                 setItems(res.data);
 
             });
+    },[]);
+    
+    const onAddToCart = (obj) => {
+        setCartItems(prev=>[...prev, obj]);
+    }
+
+    const onChangeSearchInput = (event) => {
+        console.log(event.target.value)
+        setSearchValue(event.target.value);
+    }
 
     return (
         <div className="wrapper clear">
-            {cartOpened && <Drawer onClose ={() => setCartOpened(false)}/>}
+            {cartOpened && <Drawer items={cartItems} onClose ={() => setCartOpened(false)}/>}
             <Header onClickCart={() => setCartOpened(true)}/>
             <div className="content p-40">
                 <div className="d-flex align-center mb-40 justify-between">
-                    <h1>Все кроссовки</h1>
+                    <h1>{searchValue? `Поиск по запросу "${searchValue}"` : 'Все кроссовки'}</h1>
                     <div className="search-block d-flex">
                         <img src="/img/search.svg" alt="Search" />
-                        <input placeholder="Поиск...." />
+                        {searchValue && <img onClick ={() => setSearchValue('')} className="clear cu-p" src="/img/btn-remove.svg" alt="Remove" />}
+                        <input onChange={onChangeSearchInput} value ={searchValue} placeholder="Поиск...." />
                     </div>
                 </div>
 
                 <div className="d-flex flex-wrap">
-                    {items.map((obj)=><Card title={obj.title} price={obj.price} imageUrl={obj.imageUrl} />)}
+                    {items.filter(item=>item.title.toLowerCase().includes(searchValue.toLowerCase())).map((item, index)=><Card 
+                    key={index}
+                    title={item.title}
+                    price={item.price}
+                    imageUrl={item.imageUrl} 
+                    onFavorite={() => console.log('ADDING FAVORITE')}
+                    onPlus={(obj)=>onAddToCart(obj)}/>)}
                 </div>
             </div>
         </div>
