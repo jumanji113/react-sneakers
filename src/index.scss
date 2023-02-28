@@ -69,9 +69,9 @@ header{
     display: flex;
     flex-direction: column;
     position: absolute;
-    width: 385px;
-    right: 0;
+    width:420px;
     height: 100%;
+    right: 0;
     background: #FFFFFF;
     box-shadow: -10px 4px 24px rgba(0, 0, 0, 0.1);
     padding: 30px;
@@ -145,17 +145,46 @@ header{
 .items {
     flex:1;
 }
+
+.cartEmpty {
+    text-align: center;
+  
+    p {
+      width: 280px;
+      line-height: 24px;
+    }
+  
+    .greenButton {
+      width: 245px;
+      margin-top: 20px;
+  
+      &:hover {
+        img {
+          transform: rotate(180deg) translateX(7px);
+        }
+      }
+  
+      img {
+        width: 20px;
+        position: relative;
+        top: 4px;
+        transform: rotate(180deg);
+        margin-left: 20px;
+        transition: transform 0.15s ease-in-out;
+      }
+    }
+  }
+
 .cartItem {
     border: 1px solid #f3f3f3;
     border-radius: 20px;
     overflow: hidden;
-    padding: 20px;
+
   
-    .img {
+    .cartItemImg {
       height: 70px;
       width: 70px;
       margin-right: 20px;
-      padding-top: 30px;
     }
   
     p {

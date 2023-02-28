@@ -7,6 +7,7 @@ import axios from 'axios';
 function App() {
     const [items, setItems] = useState([]);
     const [cartItems, setCartItems] = useState([]);
+    const [favorites, setFavorites] = useState([]);
     const [searchValue, setSearchValue] = useState('');
     const [cartOpened, setCartOpened] = useState();
     useEffect(() => {
@@ -18,20 +19,37 @@ function App() {
                 setItems(res.data);
 
             });
+        axios
+            .get(
+                'https://63fbb0896deb8bdb81497757.mockapi.io/Cart',
+            )
+            .then((res) => {
+                setCartItems(res.data);
+
+            });
     },[]);
     
     const onAddToCart = (obj) => {
+        axios.post('https://63fbb0896deb8bdb81497757.mockapi.io/Cart', obj);
         setCartItems(prev=>[...prev, obj]);
     }
 
+    const onRemoveCart = (id) => {
+        axios.delete(`https://63fbb0896deb8bdb81497757.mockapi.io/Cart/${id}`);
+        setCartItems(prev=>prev.filter(item => item.id !== id));
+    }
+
+    const onAddToFavorite = (obj) => {
+        setFavorites(prev=>[...prev, obj]);
+    }
+
     const onChangeSearchInput = (event) => {
-        console.log(event.target.value)
         setSearchValue(event.target.value);
     }
 
     return (
         <div className="wrapper clear">
-            {cartOpened && <Drawer items={cartItems} onClose ={() => setCartOpened(false)}/>}
+            {cartOpened && <Drawer items={cartItems} onClose ={() => setCartOpened(false)} onRemove={onRemoveCart}/>}
             <Header onClickCart={() => setCartOpened(true)}/>
             <div className="content p-40">
                 <div className="d-flex align-center mb-40 justify-between">
@@ -49,7 +67,7 @@ function App() {
                     title={item.title}
                     price={item.price}
                     imageUrl={item.imageUrl} 
-                    onFavorite={() => console.log('ADDING FAVORITE')}
+                    onFavorite={(obj) => onAddToFavorite(obj)}
                     onPlus={(obj)=>onAddToCart(obj)}/>)}
                 </div>
             </div>
